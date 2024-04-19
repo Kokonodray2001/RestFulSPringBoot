@@ -7,9 +7,10 @@ import org.springframework.web.bind.annotation.*;
 public class UserController { // controller for user only
 
     @GetMapping
-    public String getUser(@RequestParam(value = "page") int page, @RequestParam(value = "limit") int limit)
+    public String getUser(@RequestParam(value = "page") int page, @RequestParam(value = "limit") int limit ,
+                          @RequestParam(value = "name" , required = false) String name )
     {
-        return "get user was called page " + page + " and limit " + limit;
+        return "get user was called page " + page + " and limit " + limit + " and name " + name;
     }
 
     @PostMapping
