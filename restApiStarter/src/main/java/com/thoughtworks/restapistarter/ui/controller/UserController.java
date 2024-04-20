@@ -1,5 +1,6 @@
 package com.thoughtworks.restapistarter.ui.controller;
 
+import com.thoughtworks.restapistarter.ui.model.request.UpdateUserDetailsRequestModel;
 import com.thoughtworks.restapistarter.ui.model.request.UserDetailsRequestModel;
 import com.thoughtworks.restapistarter.ui.model.response.UserRest;
 import jakarta.servlet.http.HttpSession;
@@ -12,13 +13,16 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @Validated
 @RequestMapping("users") // http://localhost:8081/users
 public class UserController {
     private final HttpSession httpSession;
-
+    private Map<String,UserRest> users;
     public UserController(HttpSession httpSession) {
         this.httpSession = httpSession;
     } // controller for user only
@@ -32,12 +36,10 @@ public class UserController {
 
     @GetMapping(path = "/{userId}" , produces = {MediaType.APPLICATION_XML_VALUE , MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<UserRest> getUser(@PathVariable String userId){
-        UserRest user = new UserRest();
-        user.setEmail("kokonodray2001@gmail.com");
-        user.setFirstName("Kokonod");
-        user.setLastName("Ray");
-        user.setUserId(userId);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        if(users.containsKey(userId))
+            return new ResponseEntity<>(users.get(userId) , HttpStatus.OK);
+        else
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping(consumes = {MediaType.APPLICATION_XML_VALUE , MediaType.APPLICATION_JSON_VALUE},
@@ -47,18 +49,31 @@ public class UserController {
         newUser.setEmail(userDetails.getEmail());
         newUser.setFirstName(userDetails.getFirstName());
         newUser.setLastName(userDetails.getLastName());
-        newUser.setUserId(userDetails.getUserId());
+        newUser.setUserId(UUID.randomUUID().toString());
         newUser.setPassword(userDetails.getPassword());
+        if(users ==  null) users = new HashMap<>();
+        users.put(newUser.getUserId(),newUser);
         return new ResponseEntity<>(newUser,HttpStatus.OK);
     }
 
-    @PutMapping
-    public String updateUser(){
-        return "update user was called";
+    @PutMapping(path = "/{userId}",  produces = {MediaType.APPLICATION_XML_VALUE , MediaType.APPLICATION_JSON_VALUE},
+    consumes = {MediaType.APPLICATION_XML_VALUE , MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<UserRest> updateUser(@PathVariable String userId,@Valid @RequestBody UpdateUserDetailsRequestModel updateDetails){
+        if(!users.containsKey(userId)) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        UserRest user = users.get(userId);
+        if(updateDetails.getEmail() != null)
+            user.setEmail(updateDetails.getEmail());
+        if(updateDetails.getFirstName() != null)
+            user.setFirstName(updateDetails.getFirstName());
+        if(updateDetails.getLastName() != null)
+            user.setEmail(updateDetails.getLastName());
+
+        return new ResponseEntity<>(user,HttpStatus.OK);
     }
 
-    @DeleteMapping
-    public String deleteUser(){
-        return "delete user was called";
+    @DeleteMapping(path = "/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable String userId){
+        users.remove(userId);
+        return ResponseEntity.noContent().build();
     }
 }

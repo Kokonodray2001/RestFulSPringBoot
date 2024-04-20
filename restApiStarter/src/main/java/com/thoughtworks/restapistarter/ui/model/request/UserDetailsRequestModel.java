@@ -56,7 +56,6 @@ public class UserDetailsRequestModel {
     @Email
     private String email;
 
-    @NotNull(message = "userId can't be Null")
     private String userId;
 
     @NotNull(message = "password can't be Null")
