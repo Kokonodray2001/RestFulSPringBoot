@@ -1,15 +1,20 @@
 package com.thoughtworks.restapistarter.ui.controller;
 
+import com.thoughtworks.restapistarter.ui.model.request.UserDetailsRequestModel;
 import com.thoughtworks.restapistarter.ui.model.response.UserRest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.awt.*;
 
 @RestController
+@Validated
 @RequestMapping("users") // http://localhost:8081/users
 public class UserController {
     private final HttpSession httpSession;
@@ -35,9 +40,16 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PostMapping
-    public String createUser(){
-        return "create user was called";
+    @PostMapping(consumes = {MediaType.APPLICATION_XML_VALUE , MediaType.APPLICATION_JSON_VALUE},
+    produces = {MediaType.APPLICATION_XML_VALUE , MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<UserRest> createUser( @Valid @RequestBody UserDetailsRequestModel userDetails){
+        UserRest newUser = new UserRest();
+        newUser.setEmail(userDetails.getEmail());
+        newUser.setFirstName(userDetails.getFirstName());
+        newUser.setLastName(userDetails.getLastName());
+        newUser.setUserId(userDetails.getUserId());
+        newUser.setPassword(userDetails.getPassword());
+        return new ResponseEntity<>(newUser,HttpStatus.OK);
     }
 
     @PutMapping

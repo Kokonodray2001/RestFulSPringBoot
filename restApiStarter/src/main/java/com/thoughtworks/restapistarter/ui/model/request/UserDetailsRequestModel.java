@@ -1,13 +1,11 @@
-package com.thoughtworks.restapistarter.ui.model.response;
+package com.thoughtworks.restapistarter.ui.model.request;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 
-public class UserRest {
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String userId;
-    private String password;
-
+public class UserDetailsRequestModel {
     public String getFirstName() {
         return firstName;
     }
@@ -47,4 +45,21 @@ public class UserRest {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    @NotNull(message = "firstName can't be Null")
+    private String firstName;
+
+    @NotNull(message = "lastName can't be Null")
+    private String lastName;
+
+    @NotNull(message = "email can't be Null")
+    @Email
+    private String email;
+
+    @NotNull(message = "userId can't be Null")
+    private String userId;
+
+    @NotNull(message = "password can't be Null")
+    @Size(min = 8 , max = 16 , message = "password should be greater than or equal to 8 and less than equal to 16")
+    private String password;
 }
