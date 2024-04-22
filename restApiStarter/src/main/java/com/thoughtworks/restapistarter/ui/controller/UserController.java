@@ -1,5 +1,6 @@
 package com.thoughtworks.restapistarter.ui.controller;
 
+import com.thoughtworks.restapistarter.exception.UserServiceException;
 import com.thoughtworks.restapistarter.ui.model.request.UpdateUserDetailsRequestModel;
 import com.thoughtworks.restapistarter.ui.model.request.UserDetailsRequestModel;
 import com.thoughtworks.restapistarter.ui.model.response.UserRest;
@@ -36,6 +37,12 @@ public class UserController {
 
     @GetMapping(path = "/{userId}" , produces = {MediaType.APPLICATION_XML_VALUE , MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<UserRest> getUser(@PathVariable String userId){
+
+//      String firstName = null;
+//      int len =  firstName.length(); // null pointer exception
+
+       if(true) throw  new UserServiceException("A user service exception is thrown");
+
         if(users.containsKey(userId))
             return new ResponseEntity<>(users.get(userId) , HttpStatus.OK);
         else
