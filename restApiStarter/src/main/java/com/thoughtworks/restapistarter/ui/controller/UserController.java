@@ -1,12 +1,15 @@
 package com.thoughtworks.restapistarter.ui.controller;
 
+import com.thoughtworks.restapistarter.UserServiceImplementation;
 import com.thoughtworks.restapistarter.exception.UserServiceException;
 import com.thoughtworks.restapistarter.ui.model.request.UpdateUserDetailsRequestModel;
 import com.thoughtworks.restapistarter.ui.model.request.UserDetailsRequestModel;
 import com.thoughtworks.restapistarter.ui.model.response.UserRest;
+import com.thoughtworks.restapistarter.userService.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.apache.catalina.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +26,12 @@ import java.util.UUID;
 @RequestMapping("users") // http://localhost:8081/users
 public class UserController {
     private final HttpSession httpSession;
+
     private Map<String,UserRest> users;
+
+    @Autowired
+    UserService userService;
+
     public UserController(HttpSession httpSession) {
         this.httpSession = httpSession;
     } // controller for user only
@@ -52,15 +60,11 @@ public class UserController {
     @PostMapping(consumes = {MediaType.APPLICATION_XML_VALUE , MediaType.APPLICATION_JSON_VALUE},
     produces = {MediaType.APPLICATION_XML_VALUE , MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<UserRest> createUser( @Valid @RequestBody UserDetailsRequestModel userDetails){
-        UserRest newUser = new UserRest();
-        newUser.setEmail(userDetails.getEmail());
-        newUser.setFirstName(userDetails.getFirstName());
-        newUser.setLastName(userDetails.getLastName());
-        newUser.setUserId(UUID.randomUUID().toString());
-        newUser.setPassword(userDetails.getPassword());
-        if(users ==  null) users = new HashMap<>();
-        users.put(newUser.getUserId(),newUser);
-        return new ResponseEntity<>(newUser,HttpStatus.OK);
+
+      //  UserServiceImplementation userService =  new UserServiceImplementation(); direct dependency can't be used while testing
+
+
+        return new ResponseEntity<>(userService.createUser(userDetails),HttpStatus.OK);
     }
 
     @PutMapping(path = "/{userId}",  produces = {MediaType.APPLICATION_XML_VALUE , MediaType.APPLICATION_JSON_VALUE},
